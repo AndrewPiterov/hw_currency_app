@@ -1,6 +1,6 @@
 import 'package:auto_route/annotations.dart';
 import 'package:currency_app/app/services/exchanged_service.dart';
-import 'package:currency_app/ui/pages/home_page/home_page_controller.dart';
+import 'package:currency_app/ui/pages/home/home_page_controller.dart';
 import 'package:currency_app/ui/ui.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -15,13 +15,10 @@ class HomePage extends GetView<HomePageController> {
     Get.put(HomePageController());
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Currency Rates'),
-        leading: const Icon(Icons.arrow_back),
+        title: const Text('Курсы валют'),
         actions: [
           IconButton(
-            onPressed: () {
-              // TODO:
-            },
+            onPressed: c.goToSettings,
             icon: const Icon(Icons.settings),
           ),
         ],
@@ -69,7 +66,7 @@ class HomePage extends GetView<HomePageController> {
 
   Widget _currneciesList() {
     return StreamBuilder<List<ExchangedRatesModelPair>>(
-      stream: c.pairs$,
+      stream: c.currencyRatePairsToShow$,
       builder: (context, snapshot) {
         return ListView.separated(
           itemCount: snapshot.data?.length ?? 0,
@@ -95,7 +92,21 @@ class CurrencyPairView extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       child: Row(
         children: [
-          Expanded(child: Text(pair.currency)),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  pair.abbr,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                Text('${pair.scale} ${pair.currency}'),
+              ],
+            ),
+          ),
           Expanded(
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,

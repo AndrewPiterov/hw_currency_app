@@ -22,6 +22,8 @@ class ExchangedRatesModelPair extends Equatable {
   final ExchangedRatesModel? tomorrow;
 
   String get currency => (yesterday ?? today ?? tomorrow)!.currency;
+  String get abbr => (yesterday ?? today ?? tomorrow)!.abbr;
+  int get scale => (yesterday ?? today ?? tomorrow)!.scale;
 
   @override
   List<Object?> get props => [yesterday, today, tomorrow];
