@@ -29,13 +29,13 @@ class SettingsPage extends GetView<SettingsPageController> {
             c.reorder(oldIndex, newIndex);
           },
           itemBuilder: (_, index) {
-            final currncy = c.currencies[index];
-            final isSelected = c.selectedAbbrs.contains(currncy.abbr);
+            final currency = c.currencies[index];
+            final isSelected = c.selectedAbbrs.contains(currency.abbr);
             return CurrencySettingView(
-              currncy,
-              key: ValueKey(currncy.abbr),
+              currency,
+              key: ValueKey(currency.abbr),
               initialState: isSelected,
-              onChanged: (isSelected) => c.toggle(currncy.abbr, isSelected),
+              onChanged: (isSelected) => c.toggle(currency.abbr, isSelected),
             );
           },
         ),

@@ -1,10 +1,22 @@
 import 'package:currency_app/app/app.dart';
+import 'package:currency_app/ui/pages/home/home_page_controller.dart';
 import 'package:flutter/material.dart';
 
 class CurrencyPairView extends StatelessWidget {
-  const CurrencyPairView(this.pair, {super.key});
+  const CurrencyPairView(
+    this.pair, {
+    super.key,
+    this.mode = RateDatesMode.tomorrow,
+  });
 
   final ExchangedRatesModelPair pair;
+  final RateDatesMode mode;
+
+  double get _first =>
+      (mode == RateDatesMode.yesterday ? pair.yesterday : pair.today)!.rates;
+
+  double get _last =>
+      (mode == RateDatesMode.tomorrow ? pair.tomorrow : pair.today)!.rates;
 
   @override
   Widget build(BuildContext context) {
@@ -31,8 +43,8 @@ class CurrencyPairView extends StatelessWidget {
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceEvenly,
               children: [
-                Text(pair.yesterday?.rates.toString() ?? '-'),
-                Text(pair.today?.rates.toString() ?? '-'),
+                Text(_first.toString()),
+                Text(_last.toString()),
               ],
             ),
           ),
