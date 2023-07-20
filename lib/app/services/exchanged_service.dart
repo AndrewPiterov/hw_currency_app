@@ -9,6 +9,7 @@ import 'package:speed_up/speed_up.dart';
 
 import '../api/rest_client.dart';
 import '../models/models.dart';
+import 'app_settings_service.dart';
 
 class ExchangedRatesModelPair extends Equatable {
   const ExchangedRatesModelPair({
@@ -20,6 +21,8 @@ class ExchangedRatesModelPair extends Equatable {
   final ExchangedRatesModel? yesterday;
   final ExchangedRatesModel? today;
   final ExchangedRatesModel? tomorrow;
+
+  ExchangedRatesModel get curr => (yesterday ?? today ?? tomorrow)!;
 
   String get currency => (yesterday ?? today ?? tomorrow)!.currency;
   String get abbr => (yesterday ?? today ?? tomorrow)!.abbr;
@@ -33,8 +36,8 @@ abstract class IExchangedService {
   List<ExchangedRatesModel> get yesterdayCurrencyRates;
   List<ExchangedRatesModel> get todayCurrencyRates;
   List<ExchangedRatesModel> get tomorrowCurrencyRates;
-
   Stream<List<ExchangedRatesModelPair>> get currencyRatePairs$;
+  Stream<List<ExchangedRatesModelPair>> get currencyRatePairsToShow$;
 
   Future<ResultOf<List<ExchangedRatesModel>?>> getCurrencyRates({
     required DateTime date,
@@ -43,6 +46,7 @@ abstract class IExchangedService {
 
 class ExchangedService extends GetxService implements IExchangedService {
   final RestClient _rest = Get.find();
+  final IAppSettingsService _settingsService = Get.find();
 
   static final _formatter = DateFormat('yyyy-MM-dd');
 
@@ -91,9 +95,11 @@ class ExchangedService extends GetxService implements IExchangedService {
 
   @override
   Stream<List<ExchangedRatesModelPair>> get currencyRatePairs$ =>
-      CombineLatestStream.combine3(
-          _yesterdaySubject, _todaySubject, _tomorrowSubject,
-          (yestarday, today, tomorrow) {
+      CombineLatestStream.combine4(
+          _yesterdaySubject,
+          _todaySubject,
+          _tomorrowSubject,
+          _settingsService.order$, (yestarday, today, tomorrow, order) {
         final list = [
           ...yesterdayCurrencyRates,
           ...todayCurrencyRates,
@@ -113,6 +119,32 @@ class ExchangedService extends GetxService implements IExchangedService {
           ));
         }
 
+        // sort
+        pairs.sort((a, b) {
+          final aIndex = order.indexOf(a.abbr);
+          final bIndex = order.indexOf(b.abbr);
+          return aIndex.compareTo(bIndex);
+        });
+
         return pairs;
+      });
+
+  @override
+  Stream<List<ExchangedRatesModelPair>> get currencyRatePairsToShow$ =>
+      CombineLatestStream.combine3(
+          currencyRatePairs$,
+          _settingsService.currencyIdToShow$,
+          _settingsService.order$, (pairs, abbrs, order) {
+        // filter
+        final list = pairs.where((pair) => abbrs.contains(pair.abbr)).toList();
+
+        // sort
+        list.sort((a, b) {
+          final aIndex = order.indexOf(a.abbr);
+          final bIndex = order.indexOf(b.abbr);
+          return aIndex.compareTo(bIndex);
+        });
+
+        return list;
       });
 }

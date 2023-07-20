@@ -15,9 +15,10 @@ class SettingsPageController extends GetxController {
   List<String> get selectedAbbrs => _selectedAbbrs.toList();
 
   @override
-  void onReady() {
+  Future onReady() async {
     super.onReady();
-    _currencies.addAll(_exchangedService.todayCurrencyRates);
+    final sorted = await _exchangedService.currencyRatePairs$.first;
+    _currencies.addAll(sorted.map((e) => e.curr).toList());
     _selectedAbbrs.addAll(_appSettingsService.currencyIdToShow);
   }
 
