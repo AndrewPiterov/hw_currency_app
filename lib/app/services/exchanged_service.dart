@@ -1,5 +1,7 @@
+import 'package:currency_app/app/app.dart';
 import 'package:date_time/date_time.dart';
 import 'package:equatable/equatable.dart';
+import 'package:event_bus_plus/event_bus_plus.dart';
 import 'package:fluent_result/fluent_result.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
@@ -8,8 +10,6 @@ import 'package:rxdart/subjects.dart';
 import 'package:speed_up/speed_up.dart';
 
 import '../api/rest_client.dart';
-import '../models/models.dart';
-import 'app_settings_service.dart';
 
 class ExchangedRatesModelPair extends Equatable {
   const ExchangedRatesModelPair({
@@ -49,6 +49,7 @@ abstract class IExchangedService {
 class ExchangedService extends GetxService implements IExchangedService {
   final RestClient _rest = Get.find();
   final IAppSettingsService _settingsService = Get.find();
+  final IEventBus _eventBus = Get.find();
 
   static final _formatter = DateFormat('yyyy-MM-dd');
 
@@ -67,6 +68,8 @@ class ExchangedService extends GetxService implements IExchangedService {
   @override
   List<ExchangedRatesModel> get tomorrowCurrencyRates =>
       _tomorrowSubject.valueOrNull ?? [];
+
+  int _fetchCount = 0;
 
   @override
   Future onReady() async {
@@ -141,27 +144,42 @@ class ExchangedService extends GetxService implements IExchangedService {
 
   @override
   Future<Result> refresh() async {
+    // ! only for testing
+    _fetchCount++;
+    if (_fetchCount % 3 == 0) {
+      _eventBus.fire(const FailFetchingEvent('Test error'));
+      return fail('Test error');
+    }
+
+    // get yesterday
     final yesterday = DateTime.now().subtract(const Duration(days: 1));
     final yesterdayRates = await getCurrencyRates(date: yesterday);
     if (yesterdayRates.isFail) {
+      _eventBus.fire(FailFetchingEvent(yesterdayRates.errorMessage));
       return yesterdayRates;
     }
     _yesterdaySubject.add(yesterdayRates.value ?? []);
 
+    // get today
     final today = DateTime.now();
     final todayRates = await getCurrencyRates(date: today);
     if (todayRates.isFail) {
+      _eventBus.fire(FailFetchingEvent(todayRates.errorMessage));
       return todayRates;
     }
     _todaySubject.add(todayRates.value ?? []);
 
+    // get tomorrow
     final tomorrow = DateTime.now().add(const Duration(days: 1));
     final tomorrowRates = await getCurrencyRates(date: tomorrow);
     if (tomorrowRates.isFail) {
+      _eventBus.fire(FailFetchingEvent(tomorrowRates.errorMessage));
       return tomorrowRates;
     }
     _tomorrowSubject.add(tomorrowRates.value ?? []);
 
+    // result
+    _eventBus.fire(SuccessFetchingEvent());
     return success();
   }
 }

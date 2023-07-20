@@ -25,6 +25,7 @@ class HomePage extends GetView<HomePageController> {
   @override
   Widget build(BuildContext context) {
     Get.put(HomePageController());
+    c.context = context;
     return Scaffold(
       appBar: AppBar(
         title: const Text('Курсы валют'),
@@ -34,10 +35,12 @@ class HomePage extends GetView<HomePageController> {
             onPressed: c.changeRateDatesMode,
             icon: const Icon(Icons.published_with_changes_rounded),
           ),
-          IconButton(
-            onPressed: c.goToSettings,
-            icon: const Icon(Icons.settings),
-          ),
+          Obx(() => c.lastFailFetch != null
+              ? UI.nothing
+              : IconButton(
+                  onPressed: c.goToSettings,
+                  icon: const Icon(Icons.settings),
+                )),
         ],
       ),
       body: Column(
@@ -90,6 +93,10 @@ class HomePage extends GetView<HomePageController> {
     return StreamBuilder<List<ExchangedRatesModelPair>>(
       stream: c.currencyRatePairsToShow$,
       builder: (context, snapshot) {
+        if (!snapshot.hasData) {
+          return UI.spinner;
+        }
+
         return Obx(
           () {
             final mode = c.datesMode;

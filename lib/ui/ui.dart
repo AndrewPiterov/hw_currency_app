@@ -6,4 +6,6 @@ class UI {
   );
 
   static const spacer = Spacer();
+
+  static const nothing = SizedBox.shrink();
 }
