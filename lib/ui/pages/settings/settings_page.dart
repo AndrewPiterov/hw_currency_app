@@ -1,5 +1,6 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:currency_app/ui/pages/settings/settings_page_controller.dart';
+import 'package:currency_app/ui/widgets/widgets.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:speed_up_get/speed_up_get.dart';
@@ -20,6 +21,24 @@ class SettingsPage extends GetView<SettingsPageController> {
             icon: const Icon(Icons.check),
           ),
         ],
+      ),
+      body: Obx(
+        () => ReorderableListView.builder(
+          itemCount: c.currencies.length,
+          onReorder: (oldIndex, newIndex) {
+            c.reorder(oldIndex, newIndex);
+          },
+          itemBuilder: (_, index) {
+            final currncy = c.currencies[index];
+            final isSelected = c.selectedAbbrs.contains(currncy.abbr);
+            return CurrencySettingView(
+              currncy,
+              key: ValueKey(currncy.abbr),
+              initialState: isSelected,
+              onChanged: (isSelected) => c.toggle(currncy.abbr, isSelected),
+            );
+          },
+        ),
       ),
     );
   }

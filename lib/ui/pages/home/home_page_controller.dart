@@ -8,9 +8,20 @@ class HomePageController extends GetxController {
   final IAppSettingsService _settingsService = Get.find();
 
   Stream<List<ExchangedRatesModelPair>> get currencyRatePairsToShow$ =>
-      CombineLatestStream.combine2(_exchangedService.currencyRatePairs$,
-          _settingsService.currencyIdToShow$, (pairs, abbrs) {
+      CombineLatestStream.combine3(
+          _exchangedService.currencyRatePairs$,
+          _settingsService.currencyIdToShow$,
+          _settingsService.order$, (pairs, abbrs, order) {
+        // filter
         final list = pairs.where((pair) => abbrs.contains(pair.abbr)).toList();
+
+        // sort
+        list.sort((a, b) {
+          final aIndex = order.indexOf(a.abbr);
+          final bIndex = order.indexOf(b.abbr);
+          return aIndex.compareTo(bIndex);
+        });
+
         return list;
       });
 

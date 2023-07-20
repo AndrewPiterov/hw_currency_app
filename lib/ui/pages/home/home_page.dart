@@ -6,6 +6,8 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:speed_up_get/speed_up_get.dart';
 
+import '../../widgets/widgets.dart';
+
 @RoutePage()
 class HomePage extends GetView<HomePageController> {
   const HomePage({super.key});
@@ -77,47 +79,6 @@ class HomePage extends GetView<HomePageController> {
           separatorBuilder: (_, __) => const Divider(),
         );
       },
-    );
-  }
-}
-
-class CurrencyPairView extends StatelessWidget {
-  const CurrencyPairView(this.pair, {super.key});
-
-  final ExchangedRatesModelPair pair;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      child: Row(
-        children: [
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  pair.abbr,
-                  style: const TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                Text('${pair.scale} ${pair.currency}'),
-              ],
-            ),
-          ),
-          Expanded(
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-              children: [
-                Text(pair.yesterday?.rates.toString() ?? '-'),
-                Text(pair.today?.rates.toString() ?? '-'),
-              ],
-            ),
-          ),
-        ],
-      ),
     );
   }
 }
