@@ -8,7 +8,7 @@ import 'package:speed_up_get/speed_up_get.dart';
 import '../app.dart';
 
 export './app_settings_service.dart';
-export './exchanged_service.dart';
+export 'currencies_service.dart';
 
 Future initAsync() async {
   final pref = await SharedPreferences.getInstance();
@@ -18,5 +18,5 @@ Future initAsync() async {
   Get.put(Dio());
   Get.put(RestClient(Get.find<Dio>()));
   await registerServiceAsync<IAppSettingsService>(AppSettingsService());
-  Get.put<IExchangedService>(ExchangedService());
+  Get.put<ICurrenciesService>(CurrenciesService());
 }

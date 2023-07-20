@@ -1,5 +1,5 @@
 import 'package:auto_route/annotations.dart';
-import 'package:currency_app/app/services/exchanged_service.dart';
+import 'package:currency_app/app/services/currencies_service.dart';
 import 'package:currency_app/ui/pages/home/home_page_controller.dart';
 import 'package:currency_app/ui/ui.dart';
 import 'package:date_time/date_time.dart';

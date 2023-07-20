@@ -5,7 +5,7 @@ import 'package:get/get.dart';
 
 class SettingsPageController extends GetxController {
   final AppRouter _router = Get.find();
-  final IExchangedService _exchangedService = Get.find();
+  final ICurrenciesService _exchangedService = Get.find();
   final IAppSettingsService _appSettingsService = Get.find();
 
   final _currencies = <ExchangedRatesModel>[].obs;

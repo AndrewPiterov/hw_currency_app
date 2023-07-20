@@ -12,7 +12,7 @@ enum RateDatesMode {
 
 class HomePageController extends GetxController with GetxSubscribing {
   final AppRouter _router = Get.find();
-  final IExchangedService _exchangedService = Get.find();
+  final ICurrenciesService _exchangedService = Get.find();
   final IEventBus _eventBus = Get.find();
 
   final RefreshController _refreshController =

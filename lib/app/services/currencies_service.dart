@@ -32,7 +32,7 @@ class ExchangedRatesModelPair extends Equatable {
   List<Object?> get props => [yesterday, today, tomorrow];
 }
 
-abstract class IExchangedService {
+abstract class ICurrenciesService {
   List<ExchangedRatesModel> get yesterdayCurrencyRates;
   List<ExchangedRatesModel> get todayCurrencyRates;
   List<ExchangedRatesModel> get tomorrowCurrencyRates;
@@ -46,7 +46,7 @@ abstract class IExchangedService {
   Future<Result> refresh();
 }
 
-class ExchangedService extends GetxService implements IExchangedService {
+class CurrenciesService extends GetxService implements ICurrenciesService {
   final RestClient _rest = Get.find();
   final IAppSettingsService _settingsService = Get.find();
   final IEventBus _eventBus = Get.find();
