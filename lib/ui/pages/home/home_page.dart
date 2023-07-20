@@ -5,6 +5,7 @@ import 'package:currency_app/ui/ui.dart';
 import 'package:date_time/date_time.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:speed_up_get/speed_up_get.dart';
 
 import '../../widgets/widgets.dart';
@@ -92,13 +93,18 @@ class HomePage extends GetView<HomePageController> {
         return Obx(
           () {
             final mode = c.datesMode;
-            return ListView.separated(
-              itemCount: snapshot.data?.length ?? 0,
-              itemBuilder: (_, index) {
-                final pair = snapshot.data![index];
-                return CurrencyPairView(pair, mode: mode);
-              },
-              separatorBuilder: (_, __) => const Divider(),
+            return SmartRefresher(
+              enablePullDown: true,
+              controller: c.refreshController,
+              onRefresh: c.onRefresh,
+              child: ListView.separated(
+                itemCount: snapshot.data?.length ?? 0,
+                itemBuilder: (_, index) {
+                  final pair = snapshot.data![index];
+                  return CurrencyPairView(pair, mode: mode);
+                },
+                separatorBuilder: (_, __) => const Divider(),
+              ),
             );
           },
         );

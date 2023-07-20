@@ -42,6 +42,8 @@ abstract class IExchangedService {
   Future<ResultOf<List<ExchangedRatesModel>?>> getCurrencyRates({
     required DateTime date,
   });
+
+  Future<Result> refresh();
 }
 
 class ExchangedService extends GetxService implements IExchangedService {
@@ -69,18 +71,7 @@ class ExchangedService extends GetxService implements IExchangedService {
   @override
   Future onReady() async {
     super.onReady();
-
-    final yesterday = DateTime.now().subtract(const Duration(days: 1));
-    final yesterdayRates = await getCurrencyRates(date: yesterday);
-    _yesterdaySubject.add(yesterdayRates.value ?? []);
-
-    final today = DateTime.now();
-    final todayRates = await getCurrencyRates(date: today);
-    _todaySubject.add(todayRates.value ?? []);
-
-    final tomorrow = DateTime.now().add(const Duration(days: 1));
-    final tomorrowRates = await getCurrencyRates(date: tomorrow);
-    _tomorrowSubject.add(tomorrowRates.value ?? []);
+    await refresh();
   }
 
   @override
@@ -147,4 +138,30 @@ class ExchangedService extends GetxService implements IExchangedService {
 
         return list;
       });
+
+  @override
+  Future<Result> refresh() async {
+    final yesterday = DateTime.now().subtract(const Duration(days: 1));
+    final yesterdayRates = await getCurrencyRates(date: yesterday);
+    if (yesterdayRates.isFail) {
+      return yesterdayRates;
+    }
+    _yesterdaySubject.add(yesterdayRates.value ?? []);
+
+    final today = DateTime.now();
+    final todayRates = await getCurrencyRates(date: today);
+    if (todayRates.isFail) {
+      return todayRates;
+    }
+    _todaySubject.add(todayRates.value ?? []);
+
+    final tomorrow = DateTime.now().add(const Duration(days: 1));
+    final tomorrowRates = await getCurrencyRates(date: tomorrow);
+    if (tomorrowRates.isFail) {
+      return tomorrowRates;
+    }
+    _tomorrowSubject.add(tomorrowRates.value ?? []);
+
+    return success();
+  }
 }
